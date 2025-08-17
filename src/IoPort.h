@@ -1,5 +1,3 @@
-// IoPort.h
-
 #ifndef _IO_PORT_h
 #define _IO_PORT_h
 
@@ -11,12 +9,12 @@
 class IoPort
 {
 public:
-	virtual const uint8_t GetIoCount() { return 0; }
+	virtual uint8_t GetIoCount() const = 0;
 
 public:
-	virtual void SetMode(const uint16_t direction, const uint16_t pullUp) {}
-	virtual void SetState(const uint16_t state) {}
-	virtual const uint16_t GetState() { return 0; }
+	virtual void SetMode(const uint16_t direction, const uint16_t pullUp) = 0;
+	virtual void SetState(const uint16_t state) = 0;
+	virtual uint16_t GetState() = 0;
 
 	//TODO:
 	//virtual void SetForInterrupt() {}
