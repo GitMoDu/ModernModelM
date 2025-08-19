@@ -41,6 +41,8 @@
 
 #include "Device.h"
 
+#include "KeyboardModifierLightsTask.h"
+
 
 // Process scheduler.
 TS::Scheduler SchedulerBase;
@@ -72,6 +74,9 @@ KeyboardDriverType KeyboardDriver(&Io1, &Io2,
 // Keyboard Lights I2C slave driver.
 KeyboardIndicator ModelMIndicator(Wire);
 
+// Keyboard modifier lights task.
+KeyboardModifierLightsTask KeyboardLightsTask(SchedulerBase, ModelMIndicator);
+
 // Keyboard read and notify task.
 KeyboardMapperTask<KeyboardDriverType, Device::BLE::LONG_PRESS_POWER_OFF_PERIOD_MILLIS>KeyboardMapper(
 	SchedulerBase,
@@ -80,7 +85,8 @@ KeyboardMapperTask<KeyboardDriverType, Device::BLE::LONG_PRESS_POWER_OFF_PERIOD_
 	Device::USB::UpdatePeriodMillis, Device::BLE::UpdatePeriodMillis);
 
 // Coordinator task.
-UsbBleCoordinator Coordinator(SchedulerBase, &BMS, &ModelMIndicator, &KeyboardMapper, UsbDev, BleDev);
+RetroBle::UsbBleCoordinator Coordinator(SchedulerBase, &BMS, &ModelMIndicator, &KeyboardMapper, UsbDev, BleDev, &KeyboardLightsTask);
+
 
 void setup()
 {
@@ -129,6 +135,7 @@ void setup()
 		Device::BLE::ConnectionIntervalMax,
 		Device::Name,
 		Device::Version::Name);
+	BleKeyboard.setKeyboardLedCallback(ble_kbd_led_cb_t);
 
 	// USB setup.
 	UsbDev.Setup(Device::Name, Device::Version::Code,
@@ -193,4 +200,12 @@ uint16_t get_report_callback(uint8_t report_id, hid_report_type_t report_type, u
 void set_report_callback(uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize)
 {
 	UsbKeyboard.OnSetReportInterrupt(report_id, report_type, buffer, bufsize);
+}
+
+void ble_kbd_led_cb_t(uint16_t conn_hdl, uint8_t leds_bitmap)
+{
+	// Create mock report to passthrough state to keyboard modifier lights task.
+	Coordinator.OnBleBackReport(uint8_t(RetroBle::HidBackReport::IdEnum::KeyboardLights),
+		hid_report_type_t::HID_REPORT_TYPE_OUTPUT,
+		&leds_bitmap, sizeof(uint8_t));
 }
