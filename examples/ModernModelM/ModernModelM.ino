@@ -134,6 +134,7 @@ void setup()
 		Device::BLE::ConnectionIntervalMax,
 		Device::Name,
 		Device::Version::Name);
+	BleDev.SetBleListener(&Coordinator);
 	BleKeyboard.setKeyboardLedCallback(ble_kbd_led_cb_t);
 
 	// USB setup.
@@ -141,6 +142,7 @@ void setup()
 		Device::USB::UpdatePeriodMillis,
 		Device::USB::ProductId);
 	UsbKeyboard.Setup(Device::Name, get_report_callback, set_report_callback);
+	UsbKeyboard.SetUsbListener(&Coordinator);
 
 	// Start the device coordinator.
 	if (!Coordinator.Start())
@@ -205,6 +207,6 @@ void ble_kbd_led_cb_t(uint16_t conn_hdl, uint8_t leds_bitmap)
 {
 	// Create mock report to passthrough state to keyboard modifier lights task.
 	Coordinator.OnBleBackReport(uint8_t(RetroBle::HidBackReport::IdEnum::KeyboardLights),
-		hid_report_type_t::HID_REPORT_TYPE_OUTPUT,
-		&leds_bitmap, sizeof(uint8_t));
+		0,
+		&leds_bitmap, 1);
 }

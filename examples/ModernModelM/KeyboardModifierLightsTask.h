@@ -21,18 +21,15 @@ public:
 	{
 	}
 
-	void OnBackReport(RetroBle::HidBackReport::SourceEnum backReportSource,
-		uint8_t report_id,
-		hid_report_type_t report_type,
+	void OnBackReport(uint8_t report_id,
+		uint8_t report_type,
 		uint8_t const* buffer, uint16_t bufsize) final
 	{
-		if (report_id == (uint8_t)RetroBle::HidBackReport::IdEnum::KeyboardLights
-			&& bufsize == sizeof(uint8_t))
+		if (report_type == 0
+			&& report_id == (uint8_t)RetroBle::HidBackReport::IdEnum::KeyboardLights
+			&& bufsize == 1)
 		{
-			const uint8_t ledState = buffer[0]; // bitmask for NumLock, CapsLock, ScrollLock.
-			NumLockOn = ledState & KEYBOARD_LED_NUMLOCK;
-			CapsLockOn = ledState & KEYBOARD_LED_CAPSLOCK;
-			ScrollLockOn = ledState & KEYBOARD_LED_SCROLLLOCK;
+			SetState(buffer[0]);
 
 			TS::Task::enableIfNot();
 		}
@@ -45,6 +42,14 @@ public:
 		KeyboardIndicator.SetModifiers(NumLockOn, CapsLockOn, ScrollLockOn);
 
 		return true;
+	}
+
+private:
+	void SetState(const uint8_t lightsBitMask)
+	{
+		NumLockOn = (lightsBitMask & KEYBOARD_LED_NUMLOCK) > 0;
+		CapsLockOn = (lightsBitMask & KEYBOARD_LED_CAPSLOCK) > 0;
+		ScrollLockOn = (lightsBitMask & KEYBOARD_LED_SCROLLLOCK) > 0;
 	}
 };
 
