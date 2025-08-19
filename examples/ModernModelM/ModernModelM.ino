@@ -114,10 +114,9 @@ void setup()
 	Wire.begin();
 	Wire.setClock(Device::I2C0::Clock);
 
-	// Setup IO expanders and keyboard driver.
-	
-	if (!Io1.Setup()
-		|| !Io2.Setup()
+	// Setup IO expanders and keyboard driver.	
+	if (!Io1.Setup() // TODO: add interrupt callbacks.
+		|| !Io2.Setup() // TODO: add interrupt callbacks.
 		|| !KeyboardDriver.Setup())
 	{
 #if defined(DEBUG)

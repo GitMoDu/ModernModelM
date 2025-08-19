@@ -84,7 +84,7 @@ namespace Device
 		static constexpr uint32_t ConnectionIntervalMin = RetroBle::BleConfig::ConnectionIntervalRegular::Min;
 		static constexpr uint32_t ConnectionIntervalMax = RetroBle::BleConfig::ConnectionIntervalRegular::Max;
 
-		static constexpr uint32_t UpdatePeriodMillis = 10;
+		static constexpr uint32_t UpdatePeriodMillis = 20;
 
 		static constexpr RetroBle::BleConfig::Appearance Appearance = RetroBle::BleConfig::Appearance::Keyboard;
 
