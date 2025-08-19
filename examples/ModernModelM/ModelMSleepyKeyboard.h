@@ -23,7 +23,7 @@ public:
 	{
 	}
 
-	virtual bool Setup() final
+	bool Setup()
 	{
 		SetupPins();
 
