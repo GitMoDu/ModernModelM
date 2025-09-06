@@ -1,5 +1,3 @@
-// KeyboardLightsI2cSlave.h
-
 #ifndef _KEYBOARD_LIGHTS_I2C_SLAVE_h
 #define _KEYBOARD_LIGHTS_I2C_SLAVE_h
 

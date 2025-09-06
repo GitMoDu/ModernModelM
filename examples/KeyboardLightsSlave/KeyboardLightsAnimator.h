@@ -1,5 +1,3 @@
-// KeyboardLightsAnimator.h
-
 #ifndef _KEYBOARD_LIGHTS_ANIMATOR_TASK_h
 #define _KEYBOARD_LIGHTS_ANIMATOR_TASK_h
 
@@ -22,7 +20,6 @@ class KeyboardLightsAnimator : public virtual KeyboardLights::IKeyboardLights, p
 private:
 	static constexpr uint16_t BLE_SEARCHING_ANIMATE_PERIOD = 450;
 	static constexpr uint16_t BLE_SEARCHING_LED_OFFSET = (BLE_SEARCHING_ANIMATE_PERIOD * 1) / 3;
-	//static constexpr uint16_t BLE_SEARCHING_LED_THRESHOLD = ((uint32_t)BLE_SEARCHING_ANIMATE_PERIOD * 45) / 100;
 
 private:
 	uint32_t AnimationStart = 0;
@@ -36,7 +33,6 @@ private:
 private:
 	BrightnessAnimator<brightnessRange, Pin, onState> Driver;
 
-
 public:
 	KeyboardLightsAnimator(TS::Scheduler& scheduler,
 		const uint32_t updatePeriod = 10)
@@ -48,23 +44,11 @@ public:
 	void Start()
 	{
 		Driver.Start();
-		/*pinMode((uint8_t)Pin::NumLock, OUTPUT);
-		digitalWrite((uint8_t)Pin::NumLock, IoState(false));
-
-		pinMode((uint8_t)Pin::CapsLock, OUTPUT);
-		digitalWrite((uint8_t)Pin::CapsLock, IoState(false));
-
-		pinMode((uint8_t)Pin::ScrollLock, OUTPUT);
-		digitalWrite((uint8_t)Pin::ScrollLock, IoState(false));*/
 	}
 
 	void Stop()
 	{
 		Driver.Stop();
-		//SetLed(false, false, false);
-		//pinMode((uint8_t)Pin::NumLock, INPUT);
-		//pinMode((uint8_t)Pin::CapsLock, INPUT);
-		//pinMode((uint8_t)Pin::ScrollLock, INPUT);
 	}
 
 	void WakeUp()
@@ -139,43 +123,7 @@ public:
 		}
 
 		Driver.SetBrightness(numLock, capsLock, scrollLock);
-
-		//SetLed(numLock, capsLock, scrollLock);
 	}
-
-	//void UpdateLedState2()
-	//{
-	//	const uint32_t timestamp = millis();
-	//	const uint32_t elapsed = timestamp - AnimationStart;
-
-	//	bool capsLock = false;
-	//	bool numLock = false;
-	//	bool scrollLock = false;
-
-	//	switch (Mode)
-	//	{
-	//	case KeyboardLights::ModeEnum::Ble:
-	//		numLock = NumLock;
-	//		capsLock = CapsLock;
-	//		scrollLock = true;
-	//		break;
-	//	case KeyboardLights::ModeEnum::Usb:
-	//		numLock = NumLock;
-	//		capsLock = CapsLock;
-	//		scrollLock = true;
-	//		break;
-	//	case KeyboardLights::ModeEnum::Searching: // Phased animation using all three LEDs.
-	//		numLock = ((elapsed + (BLE_SEARCHING_LED_OFFSET * 2)) % BLE_SEARCHING_ANIMATE_PERIOD) >= BLE_SEARCHING_LED_THRESHOLD;
-	//		capsLock = ((elapsed + (BLE_SEARCHING_LED_OFFSET * 1)) % BLE_SEARCHING_ANIMATE_PERIOD) >= BLE_SEARCHING_LED_THRESHOLD;
-	//		scrollLock = ((elapsed + (BLE_SEARCHING_LED_OFFSET * 0)) % BLE_SEARCHING_ANIMATE_PERIOD) >= BLE_SEARCHING_LED_THRESHOLD;
-	//		break;
-	//	case KeyboardLights::ModeEnum::Off:
-	//	default:
-	//		break;
-	//	}
-
-	//	SetLed(numLock, capsLock, scrollLock);
-	//}
 
 private:
 	static constexpr uint8_t GetSearchingBrightness(const uint32_t elapsed)

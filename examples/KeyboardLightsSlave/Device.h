@@ -1,8 +1,5 @@
-// Device.h
-
 #ifndef _DEVICE_h
 #define _DEVICE_h
-
 
 namespace Device
 {
@@ -35,7 +32,4 @@ namespace Device
 #endif
 	}
 }
-
-
 #endif
-

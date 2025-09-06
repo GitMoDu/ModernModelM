@@ -1,7 +1,5 @@
-// BrightnessAnimator.h
-
-#ifndef _BRIGHTNESSANIMATOR_h
-#define _BRIGHTNESSANIMATOR_h
+#ifndef _BRIGHTNESS_ANIMATOR_h
+#define _BRIGHTNESS_ANIMATOR_h
 
 #define _TASK_OO_CALLBACKS
 #include <TSchedulerDeclarations.hpp>

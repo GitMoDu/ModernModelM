@@ -1,7 +1,5 @@
-// KeyboardLights.h
-
-#ifndef _KEYBOARDLIGHTS_h
-#define _KEYBOARDLIGHTS_h
+#ifndef _KEYBOARD_LIGHTS_h
+#define _KEYBOARD_LIGHTS_h
 
 #include <TemplateI2c.h>
 
