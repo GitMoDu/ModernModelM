@@ -60,8 +60,8 @@ namespace Device
 			enum class Pin : uint8_t
 			{
 				RST = 0,
-				IRQA = 1,
-				IRQB = 2
+				IRQA = 7,
+				IRQB = 8
 			};
 		}
 
@@ -72,9 +72,9 @@ namespace Device
 
 			enum class Pin : uint8_t
 			{
-				RST = 7,
-				IRQA = 8,
-				IRQB = 9
+				RST = 1,
+				IRQA = 9,
+				IRQB = 10
 			};
 		}
 	}

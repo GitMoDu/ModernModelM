@@ -12,6 +12,11 @@ template<typename PinIo1,
 	typename PinIo2>
 class ModelMSleepyKeyboard : public BatteryManager::ISleep, public ModelMKeyboardHidMapped
 {
+private:
+	void (*WakeInterrupt)() = nullptr;
+
+	volatile bool IrqFired = false;
+
 public:
 	ModelMSleepyKeyboard(IoPort* io1, IoPort* io2,
 		const uint16_t* columnMap,
@@ -23,9 +28,9 @@ public:
 	{
 	}
 
-	bool Setup()
+	bool Setup(void (*onWakeInterrupt)())
 	{
-		SetupPins();
+		WakeInterrupt = onWakeInterrupt;
 
 		if (ModelMKeyboardHidMapped::Setup())
 		{
@@ -42,26 +47,39 @@ public:
 	/// <returns>False if sleep isn't possible right now.</returns>
 	bool WakeOnInterrupt() final
 	{
-		return false;
+		// Disable wake interrupt.
+		ModelMKeyboardHidMapped::DisableKeyInterrupt();
+
+		// If interrupt already fired, do not enter sleep.
+		if (IrqFired)
+		{
+			return false;
+		}
+
+		// Setup wake interrupt.
+		IrqFired = false;
+		ModelMKeyboardHidMapped::AttachAnyKeyInterrupt(WakeInterrupt);
+
+		// Enter sleep if no interrupt fired during setup.
+		return !IrqFired;
 	}
 
+
 	/// <summary>
-	/// Device has just woken up from sleep, restore peripheral.
+	/// Device has just woken up from sleep, restore peripherals.
 	/// </summary>
 	void OnWakeUp() final
 	{
-	}
+		IrqFired = true;
 
-private:
-	void SetupPins()
-	{
-		pinMode((uint8_t)PinIo1::RST, INPUT);
-		pinMode((uint8_t)PinIo1::IRQA, INPUT);
-		pinMode((uint8_t)PinIo1::IRQB, INPUT);
+		// Disable wake interrupt.
+		ModelMKeyboardHidMapped::DisableKeyInterrupt();
 
-		pinMode((uint8_t)PinIo2::RST, INPUT);
-		pinMode((uint8_t)PinIo2::IRQA, INPUT);
-		pinMode((uint8_t)PinIo2::IRQB, INPUT);
+		// Clear keyboard state and restore input mode.
+		ModelMKeyboardHidMapped::ClearState();
+		ModelMKeyboardHidMapped::SetInputModeAll();
+
+		//TODO: Notify manager about wake event.
 	}
 };
 #endif

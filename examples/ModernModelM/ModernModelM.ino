@@ -115,9 +115,9 @@ void setup()
 	Wire.setClock(Device::I2C0::Clock);
 
 	// Setup IO expanders and keyboard driver.	
-	if (!Io1.Setup() // TODO: add interrupt callbacks.
-		|| !Io2.Setup() // TODO: add interrupt callbacks.
-		|| !KeyboardDriver.Setup())
+	if (!Io1.Setup()
+		|| !Io2.Setup()
+		|| !KeyboardDriver.Setup(OnAnyKeyInterrupt))
 	{
 #if defined(DEBUG)
 		Serial.println(F("Error starting KeyboardDriver."));
@@ -171,6 +171,11 @@ void PinSetup()
 		pinMode(pin, INPUT);
 		digitalWrite(pin, LOW);
 	}
+}
+
+void OnAnyKeyInterrupt()
+{
+	KeyboardMapper.OnWakeUp();
 }
 
 // Event callbacks.

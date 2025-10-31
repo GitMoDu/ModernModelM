@@ -45,6 +45,7 @@ public:
 	{
 		EscapeHold.Clear();
 		Driver.OnWakeUp();
+		OnWakeInterrupt();
 	}
 
 protected:
