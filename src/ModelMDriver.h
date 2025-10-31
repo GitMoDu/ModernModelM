@@ -48,6 +48,12 @@ public:
 			SetMode(0, 0, 0, 0);
 			SetState(0, 0);
 
+			// Disable interrupts by default.
+			SetIRQ(0, 0, 0);
+
+			// Io2 IRQs are not used.
+			Io2->AttachInterrupt(nullptr, nullptr);
+
 			return true;
 		}
 
@@ -62,6 +68,32 @@ public:
 	}
 
 protected:
+	void DisableKeyInterrupt()
+	{
+		// Disable IRQs.
+		SetIRQ(0, 0, 0);
+
+		// Disable interrupt handler by setting null callbacks.
+		Io1->AttachInterrupt(nullptr, nullptr);
+		// Io2 IRQs are not used.
+	}
+
+	void AttachAnyKeyInterrupt(void (*irqInterrupt)())
+	{
+		// Set all columns to output and rows as input pull-up.
+		SetMode(UINT16_MAX, 0, 0, UINT8_MAX);
+		SetState(0, 0);
+
+		// Enable IRQs on all rows with CHANGE mode (triggers on any state change).
+		// Mode 0 would disable, so we need a non-zero mode value.
+		// The MCP23017 hardware detects changes from previous state.
+		SetIRQ(0, 0b11111111, CHANGE);
+
+		// Attach the interrupt handler to both IRQA and INTB of Io1 (rows are on Io1).
+		Io1->AttachInterrupt(irqInterrupt, irqInterrupt);
+		// Io2 IRQs are not used.
+	}
+
 	void ClearState()
 	{
 		for (size_t i = 0; i < ColumnCount; i++)
@@ -131,6 +163,12 @@ private:
 	{
 		Io1->SetState(GetSlice1(columnState, rowState));
 		Io2->SetState(GetSlice2(columnState));
+	}
+
+	void SetIRQ(const uint16_t columnMask, const uint8_t rowMask, const uint8_t mode)
+	{
+		Io1->SetIRQ(GetSlice1(columnMask, rowMask), mode);
+		Io2->SetIRQ(GetSlice2(columnMask), mode);
 	}
 
 	const uint8_t GetRowState()
