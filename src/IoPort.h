@@ -16,11 +16,10 @@ public:
 	virtual void SetState(const uint16_t state) = 0;
 	virtual uint16_t GetState() = 0;
 
-	//TODO:
-	//virtual void SetForInterrupt() {}
+	//virtual void DisableIRQ() = 0;
+	virtual void SetIRQ(const uint16_t mask, const uint8_t mode) = 0;
 
-	//TODO:
-	//virtual void RestorePins() {}
+	virtual void AttachInterrupt(void (*irqInterruptA)() = nullptr, void (*irqInterruptB)() = nullptr) = 0;
 };
 
 #endif

@@ -38,35 +38,82 @@ public:
 	{
 	}
 
-	////TODO:
-	//virtual void SetForInterrupt() final
-	//{
-	//	//attachInterrupt(digitalPinToInterrupt(InterruptPin), INPUT_)
-	//}
-
-	////TODO:
-	//virtual void RestorePins() final
-	//{
-	//	//detachInterrupt(InterruptPin);
-	//}
-
-
 	bool Setup()
 	{
+		pinMode((uint8_t)Pin::RST, INPUT);
+		pinMode((uint8_t)Pin::IRQA, INPUT_PULLUP);
+		pinMode((uint8_t)Pin::IRQB, INPUT_PULLUP);
+
 		if (Driver.begin(true))
 		{
 			// Make the PCB layout make sense.
 			Driver.reverse16ByteOrder(true);
+
+			// Disable interrupts by default.
+			SetIRQ(0, 0);
 
 			return true;
 		}
 
 		return false;
 	}
-	//bool Setup(void (*onIoInterrupt)(), const uint8_t interruptPin1, const uint8_t interruptPin2)
-
 
 public:
+	void SetIRQ(const uint16_t mask, const uint8_t mode) final
+	{
+		Driver.enableInterrupt16(mask, mode);
+	}
+
+	void AttachInterrupt(void (*irqInterruptA)() = nullptr, void (*irqInterruptB)() = nullptr)
+	{
+		static constexpr uint8_t pinIrqA = (uint8_t)Pin::IRQA;
+		static constexpr uint8_t pinIrqB = (uint8_t)Pin::IRQB;
+
+		if (irqInterruptA != nullptr)
+		{
+#if defined(ARDUINO_Seeed_XIAO_nRF52840_Sense) || defined(ARDUINO_Seeed_XIAO_nRF52840)
+			enableInterruptIRQ(digitalPinToInterrupt(pinIrqA));
+			attachInterrupt(digitalPinToInterrupt(pinIrqA), irqInterruptA, FALLING);
+			pinMode(pinIrqA, INPUT_PULLUP_SENSE);
+#else
+			pinMode(pinIrqA, INPUT_PULLUP);
+			enableInterrupt(digitalPinToInterrupt(pinIrqA));
+#endif
+		}
+		else
+		{
+#if defined(ARDUINO_Seeed_XIAO_nRF52840_Sense) || defined(ARDUINO_Seeed_XIAO_nRF52840)
+			pinMode(pinIrqA, INPUT_PULLUP);
+			disableInterruptIRQ(digitalPinToInterrupt(pinIrqA));
+#else
+			pinMode(pinIrqA, INPUT);
+			disableInterrupt(digitalPinToInterrupt(pinIrqA));
+#endif
+		}
+
+		if (irqInterruptB != nullptr)
+		{
+#if defined(ARDUINO_Seeed_XIAO_nRF52840_Sense) || defined(ARDUINO_Seeed_XIAO_nRF52840)
+			enableInterruptIRQ(digitalPinToInterrupt(pinIrqB));
+			attachInterrupt(digitalPinToInterrupt(pinIrqB), irqInterruptB, FALLING);
+			pinMode(pinIrqB, INPUT_PULLUP_SENSE);
+#else
+			pinMode(pinIrqB, INPUT_PULLUP);
+			enableInterrupt(digitalPinToInterrupt(pinIrqB));
+#endif
+		}
+		else
+		{
+#if defined(ARDUINO_Seeed_XIAO_nRF52840_Sense) || defined(ARDUINO_Seeed_XIAO_nRF52840)
+			pinMode(pinIrqB, INPUT_PULLUP);
+			disableInterruptIRQ(digitalPinToInterrupt(pinIrqB));
+#else
+			pinMode(pinIrqB, INPUT);
+			disableInterrupt(digitalPinToInterrupt(pinIrqB));
+#endif
+		}
+	}
+
 	uint8_t GetIoCount() const final
 	{
 		return IoCount;
