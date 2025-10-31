@@ -19,8 +19,8 @@ namespace Device
 
 	namespace Version
 	{
-		static constexpr uint16_t Code = 0;
-		static constexpr char Name[] = "0";
+		static constexpr uint16_t Code = 1;
+		static constexpr char Name[] = "1";
 	}
 
 	namespace BMS
